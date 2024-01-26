@@ -23,8 +23,48 @@ GalsenDevConnect is a social network platform designed for Senegalese developers
 - JWT: JSON Web Tokens for secure user authentication
 - Redux: State management for React applications
 
+
+
 ## Installation
 
-1. Clone the repository:
-   ```bash
+
+  
+
+1. **Clone the repository & Navigate to the project directory:**
+
+    ```
    git clone https://github.com/VotreNom/GalsenDevConnect.git
+   ```
+    ```
+    cd GalsenDevConnect
+    ```
+
+2. **Install dependencies for the server:**
+
+    ```
+    cd server
+    npm install
+    ```
+
+3. **Install dependencies for the client:**
+
+    ```
+    cd client
+    npm install
+    ```
+
+4. **Run the server and client concurrently:**
+
+    ```
+    npm run dev
+    ```
+
+5. **Access the application in your browser at [http://localhost:3000](http://localhost:3000)**
+
+## Contributing
+
+If you would like to contribute to the project, please follow the [Contribution Guidelines](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the MIT License.
