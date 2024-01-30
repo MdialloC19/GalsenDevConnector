@@ -1,5 +1,5 @@
 php_errors.log
 node_modules/
 .env
-./config/default.json
+config/default.json
 
