@@ -97,7 +97,7 @@ router.post(
       console.log(error.message);
       res.status(500).json({
         sucess: false,
-        error: error.message,
+        error: [error.message],
       });
     }
   }
