@@ -15,12 +15,26 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  previousPassword: [String],
   avatar: {
     type: String,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   },
   date: {
     type: Date,
     default: Date.now(),
   },
 });
+
+// UserSchema.pre("find", function () {
+//   this.where({ isDeleted: false });
+// });
+
+// UserSchema.pre("findOne", function () {
+//   this.where({ isDeleted: false });
+// });
+
 module.exports = User = mongoose.model("user", UserSchema);

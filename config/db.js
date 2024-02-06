@@ -13,6 +13,7 @@ const connectDB = async () => {
     console.log("MongoDB connected...");
   } catch (error) {
     console.log(error.message);
+
     process.exit(1);
   }
 };
@@ -55,6 +56,39 @@ async function createProfileForUsers() {
     mongoose.disconnect();
   }
 }
+
+async function updateAllUsers(updateFields) {
+  try {
+    const users = await User.find({});
+    console.log(users);
+    for (const user of users) {
+      Object.keys(updateFields).forEach((field) => {
+        if (user[field] === undefined) {
+          user[field] = updateFields[field];
+          // console.log(user[field]);
+        }
+      });
+    }
+
+    console.log(users);
+    await Promise.all(users.map((user) => user.save()));
+    console.log("Document update completed.");
+  } catch (error) {
+    console.error("Error during document update:", error);
+    throw error;
+  } finally {
+    mongoose.disconnect();
+  }
+}
+
+const updateFields = {
+  previousPassword: [String],
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+};
+// updateAllUsers(updateFields);
 
 // Use the function to create profiles for all users
 // createProfileForUsers();

@@ -41,6 +41,36 @@ router.get("/me", authMiddleware, async (req, res) => {
 });
 
 /**
+ * @desc Route to get All profile.
+ * @route GET api/profile/me
+ * @access Public
+ */
+
+router.get("/", async (req, res) => {
+  try {
+    const allProfiles = await Profiles.find({}).populate("user", [
+      "name",
+      "avatar",
+    ]);
+    if (!allProfiles) {
+      return res.status(400).json({
+        errors: [{ msg: "None Profile Found" }],
+      });
+    }
+    return res.status(200).json({
+      sucess: true,
+      data: allProfiles,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
+  }
+});
+
+/**
  * @route POST api/profile
  * @desc Create or Update user Profile
  * @access Private
