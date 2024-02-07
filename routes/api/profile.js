@@ -20,6 +20,13 @@ router.get("/me", authMiddleware, profileControllers.getCurrentProfile);
 router.get("/", profileControllers.getAllProfiles);
 
 /**
+ * @route GET api/profile/user/:user_id
+ * @desc GET profile by user ID
+ * @access Public
+ */
+
+router.get("/user/:user_id", profileControllers.getProfileByUserId);
+/**
  * @route POST api/profile
  * @desc Create or Update user Profile
  * @access Private
@@ -36,5 +43,11 @@ router.post(
   ],
   profileControllers.updateUserProfile
 );
+
+/**
+ * @route DELETE api/profile
+ * @desc Delete profile and user
+ * @access Private
+ */
 
 module.exports = router;

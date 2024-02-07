@@ -1,5 +1,4 @@
-const express = require("express");
-const { check, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 const Profile = require("../models/Profile");
 
 exports.getCurrentProfile = async (req, res) => {
@@ -7,7 +6,6 @@ exports.getCurrentProfile = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
   const userId = req.user.id;
   try {
     let currentProfile = await Profile.findOne({ user: userId }).populate(
@@ -34,7 +32,7 @@ exports.getCurrentProfile = async (req, res) => {
 
 exports.getAllProfiles = async (req, res) => {
   try {
-    const allProfiles = await Profiles.find({}).populate("user", [
+    const allProfiles = await Profile.find({}).populate("user", [
       "name",
       "avatar",
     ]);
@@ -50,6 +48,34 @@ exports.getAllProfiles = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
+  }
+};
+
+exports.getProfileByUserId = async (req, res) => {
+  try {
+    const profile = await Profile.findOne({
+      user: req.params.user_id,
+    }).populate("user", ["name", "avatar"]);
+    if (!profile) {
+      return res.status(400).json({
+        errors: [{ msg: "There is no profile for this user" }],
+      });
+    }
+    return res.status(200).json({
+      sucess: true,
+      data: profile,
+    });
+  } catch (error) {
+    console.log(error.message);
+    if ((error.kind = "ObjectId")) {
+      return res.status(400).json({
+        errors: [{ msg: "There is no profile for this user" }],
+      });
+    }
+    return res.status(500).json({
       sucess: false,
       errors: [{ msg: error.message }],
     });

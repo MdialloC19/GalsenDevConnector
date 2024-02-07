@@ -29,12 +29,18 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-// UserSchema.pre("find", function () {
-//   this.where({ isDeleted: false });
-// });
+const skipDeleted = function (next) {
+  if (!this.isDeleted) {
+    next();
+  }
+};
 
-// UserSchema.pre("findOne", function () {
-//   this.where({ isDeleted: false });
-// });
+UserSchema.pre("find", skipDeleted);
+UserSchema.pre("findOne", skipDeleted);
+UserSchema.pre("updateOne", skipDeleted);
+UserSchema.pre("updateMany", skipDeleted);
+UserSchema.pre("findOneAndUpdate", skipDeleted);
+UserSchema.pre("deleteOne", skipDeleted);
+UserSchema.pre("deleteMany", skipDeleted);
 
 module.exports = User = mongoose.model("user", UserSchema);

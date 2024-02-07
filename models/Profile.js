@@ -104,10 +104,28 @@ const ProfileSchema = new mongoose.Schema({
       type: String,
     },
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   date: {
     type: Date,
     default: Date.now,
   },
 });
+
+const skipDeleted = function (next) {
+  if (!this.isDeleted) {
+    next();
+  }
+};
+
+ProfileSchema.pre("find", skipDeleted);
+ProfileSchema.pre("findOne", skipDeleted);
+ProfileSchema.pre("updateOne", skipDeleted);
+ProfileSchema.pre("updateMany", skipDeleted);
+ProfileSchema.pre("findOneAndUpdate", skipDeleted);
+ProfileSchema.pre("deleteOne", skipDeleted);
+ProfileSchema.pre("deleteMany", skipDeleted);
 
 module.exports = mongoose.model("profile", ProfileSchema);

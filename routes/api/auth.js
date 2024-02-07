@@ -4,12 +4,12 @@ const router = express.Router();
 const { check } = require("express-validator");
 const authControllers = require("../../controllers/authControllers");
 
-/** 
+/**
  * @desc Route to get all auth.
  * @route GET api/auth
  * @access Public
  *
- * /
+ */
 router.get("/", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
