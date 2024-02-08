@@ -84,12 +84,11 @@ exports.getProfileByUserId = async (req, res) => {
 };
 
 exports.updateUserProfile = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const {
       company,
       website,
@@ -140,6 +139,43 @@ exports.updateUserProfile = async (req, res) => {
       .json({ success: false, errors: [{ msg: error.message }] });
   }
 };
+
+exports.putExperience = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { title, company, location, from, to, current, description } = req.body;
+
+  const newExp = {
+    title,
+    company,
+    location,
+    from,
+    to,
+    current,
+    description,
+  };
+
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    profile.experience.unshift(newExp);
+
+    await profile.save();
+
+    return res.status(200).json({ success: true, data: profile });
+  } catch (error) {
+    onsole.error(error.message);
+    return res
+      .status(500)
+
+      .json({ success: false, errors: [{ msg: error.message }] });
+  }
+};
+
+exports.hardDeleteExperience = async (req, res) => {};
 
 exports.deleteProfile = async (req, res) => {
   const errors = validationResult(req);

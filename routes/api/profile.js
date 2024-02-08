@@ -45,6 +45,35 @@ router.post(
 );
 
 /**
+ * @route PUT api/profile/experience
+ * @desc  Update profile with experience
+ * @access Private
+ */
+
+router.put(
+  "/experience",
+  [
+    authMiddleware,
+    check("title", "Title is required").notEmpty(),
+    check("company", "Company is required").notEmpty(),
+    check("from", "From date is required and needs to be from the past")
+      .notEmpty()
+      .custom((value, { req }) => (req.body.to ? value < req.body.to : true)),
+  ],
+  profileControllers.putExperience
+);
+
+/**
+ * @route delete api/profile/experience/:exp_id
+ * @desc  hard delete for experience profile with experience
+ * @access Private
+ */
+router.delete(
+  "/experience/:exp_id",
+  authMiddleware,
+  profileControllers.hardDeleteExperience
+);
+/**
  * @route DELETE api/profile
  * @desc Delete profile and user
  * @access Private

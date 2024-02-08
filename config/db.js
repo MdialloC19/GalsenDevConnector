@@ -59,18 +59,20 @@ async function createProfileForUsers() {
 
 async function updateAllUsers(updateFields) {
   try {
-    const users = await User.find({});
-    console.log(users);
+    const users = await Profile.find({});
+
     for (const user of users) {
       Object.keys(updateFields).forEach((field) => {
-        if (user[field] === undefined) {
-          user[field] = updateFields[field];
-          // console.log(user[field]);
+        if (
+          user.experience[field] === undefined ||
+          user.education[field] === undefined
+        ) {
+          user.experience[field] = updateFields[field];
+          user.education[field] = updateFields[field];
+          console.log(user.experience);
         }
       });
     }
-
-    console.log(users);
     await Promise.all(users.map((user) => user.save()));
     console.log("Document update completed.");
   } catch (error) {
@@ -82,7 +84,7 @@ async function updateAllUsers(updateFields) {
 }
 
 const updateFields = {
-  previousPassword: [String],
+  // previousPassword: [String],
   isDeleted: {
     type: Boolean,
     default: false,

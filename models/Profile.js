@@ -55,6 +55,10 @@ const ProfileSchema = new mongoose.Schema({
       description: {
         type: String,
       },
+      isDeleted: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   education: [
@@ -85,6 +89,10 @@ const ProfileSchema = new mongoose.Schema({
       description: {
         type: String,
       },
+      isDeleted: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   social: {
@@ -114,16 +122,18 @@ const ProfileSchema = new mongoose.Schema({
   },
 });
 
-const skipDeleted = function () {
-  this.where({ isDeleted: false });
-};
+// const skipDeleted = function () {
+//   this.where({ isDeleted: false });
+//   this.find({ "experience.isDeleted": { $ne: false } });
+// };
 
-ProfileSchema.pre("find", skipDeleted);
-ProfileSchema.pre("findOne", skipDeleted);
-ProfileSchema.pre("updateOne", skipDeleted);
-ProfileSchema.pre("updateMany", skipDeleted);
-ProfileSchema.pre("findOneAndUpdate", skipDeleted);
-ProfileSchema.pre("deleteOne", skipDeleted);
-ProfileSchema.pre("deleteMany", skipDeleted);
+// ProfileSchema.pre("find", skipDeleted);
+// ProfileSchema.pre("findOne", skipDeleted);
+// ProfileSchema.pre("findById", skipDeleted);
+// ProfileSchema.pre("updateOne", skipDeleted);
+// ProfileSchema.pre("updateMany", skipDeleted);
+// ProfileSchema.pre("findOneAndUpdate", skipDeleted);
+// ProfileSchema.pre("deleteOne", skipDeleted);
+// ProfileSchema.pre("deleteMany", skipDeleted);
 
 module.exports = mongoose.model("profile", ProfileSchema);
