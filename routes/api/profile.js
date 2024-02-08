@@ -50,4 +50,6 @@ router.post(
  * @access Private
  */
 
+router.delete("/", authMiddleware, profileControllers.deleteProfile);
+
 module.exports = router;

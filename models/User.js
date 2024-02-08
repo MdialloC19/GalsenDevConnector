@@ -29,14 +29,13 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-const skipDeleted = function (next) {
-  if (!this.isDeleted) {
-    next();
-  }
+const skipDeleted = function () {
+  this.where({ isDeleted: false });
 };
 
 UserSchema.pre("find", skipDeleted);
 UserSchema.pre("findOne", skipDeleted);
+UserSchema.pre("findById", skipDeleted);
 UserSchema.pre("updateOne", skipDeleted);
 UserSchema.pre("updateMany", skipDeleted);
 UserSchema.pre("findOneAndUpdate", skipDeleted);

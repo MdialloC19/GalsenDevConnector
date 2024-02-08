@@ -114,10 +114,8 @@ const ProfileSchema = new mongoose.Schema({
   },
 });
 
-const skipDeleted = function (next) {
-  if (!this.isDeleted) {
-    next();
-  }
+const skipDeleted = function () {
+  this.where({ isDeleted: false });
 };
 
 ProfileSchema.pre("find", skipDeleted);

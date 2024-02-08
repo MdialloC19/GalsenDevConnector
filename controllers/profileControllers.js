@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Profile = require("../models/Profile");
+const { profile_url } = require("gravatar");
 
 exports.getCurrentProfile = async (req, res) => {
   const errors = validationResult(req);
@@ -137,5 +138,53 @@ exports.updateUserProfile = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, errors: [{ msg: error.message }] });
+  }
+};
+
+exports.deleteProfile = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  try {
+    /**
+     * @todo -remove users posts
+     */
+    const fieldsToUpdate = { isDeleted: true };
+    const options = { new: true };
+    // Remove profile
+
+    profile = await Profile.findOneAndUpdate(
+      { user: req.user.id },
+      { $set: fieldsToUpdate },
+      options
+    );
+
+    // Remove user
+
+    user = await User.findOneAndUpdate(
+      { _id: req.user.id },
+      { $set: fieldsToUpdate },
+      options
+    );
+
+    if (!profile || !user) {
+      return res.status(400).json({
+        errors: [{ msg: "None user Found" }],
+      });
+    }
+    return res.status(200).json({
+      sucess: true,
+      data: {
+        user,
+        profile,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
   }
 };
