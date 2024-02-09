@@ -167,15 +167,69 @@ exports.putExperience = async (req, res) => {
 
     return res.status(200).json({ success: true, data: profile });
   } catch (error) {
-    onsole.error(error.message);
+    console.error(error.message);
     return res
       .status(500)
-
       .json({ success: false, errors: [{ msg: error.message }] });
   }
 };
 
-exports.hardDeleteExperience = async (req, res) => {};
+exports.hardDeleteExperience = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+    profile.experience = profile.experience.filter(
+      (exp) => exp._id.toString() !== req.params.exp_id
+    );
+    await profile.save();
+    return res.status(200).json({
+      sucess: true,
+      data: profile,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res
+      .status(500)
+      .json({ success: false, errors: [{ msg: error.message }] });
+  }
+};
+
+exports.softDeleteExperience = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const fieldsToUpdate = { "experience.$.isDeleted": true };
+    const options = { new: true };
+    const profile = await Profile.findOneAndUpdate(
+      {
+        user: req.user.id,
+        "experience._id": req.params.exp_id,
+      },
+
+      {
+        $set: { "experience.$.isDeleted": true },
+      },
+      options
+    );
+    return res.status(200).json({
+      sucess: true,
+      data: profile,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
+  }
+};
 
 exports.deleteProfile = async (req, res) => {
   const errors = validationResult(req);

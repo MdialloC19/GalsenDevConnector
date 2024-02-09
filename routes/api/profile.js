@@ -64,6 +64,17 @@ router.put(
 );
 
 /**
+ * @route delete api/profile/exp/:exp_id
+ * @desc  soft delete for experience profile with experience
+ * @access Private
+ */
+router.delete(
+  "/exp/:exp_id",
+  authMiddleware,
+  profileControllers.softDeleteExperience
+);
+
+/**
  * @route delete api/profile/experience/:exp_id
  * @desc  hard delete for experience profile with experience
  * @access Private
