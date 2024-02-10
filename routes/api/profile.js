@@ -64,7 +64,7 @@ router.put(
 );
 
 /**
- * @route delete api/profile/exp/:exp_id
+ * @route Soft delete api/profile/exp/:exp_id
  * @desc  soft delete for experience profile with experience
  * @access Private
  */
@@ -75,7 +75,7 @@ router.delete(
 );
 
 /**
- * @route delete api/profile/experience/:exp_id
+ * @route Hard delete api/profile/experience/:exp_id
  * @desc  hard delete for experience profile with experience
  * @access Private
  */
@@ -103,6 +103,17 @@ router.put(
       .custom((value, { req }) => (req.body.to ? value < req.body.to : true)),
   ],
   profileControllers.putEducation
+);
+
+/**
+ * @route Soft delete api/profile/edu/:edu_id
+ * @desc  soft delete for education profile with education
+ * @access Private
+ */
+router.delete(
+  "/edu/:edu_id",
+  authMiddleware,
+  profileControllers.softDeleteEducation
 );
 
 /**

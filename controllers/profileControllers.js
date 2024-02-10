@@ -253,6 +253,39 @@ exports.putEducation = async (req, res) => {
   }
 };
 
+exports.softDeleteEducation = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const fieldsToUpdate = { "education.$.isDeleted": true };
+    const options = { new: true };
+    const profile = await Profile.findOneAndUpdate(
+      {
+        user: req.user.id,
+        "education._id": req.params.edu_id,
+      },
+
+      {
+        $set: fieldsToUpdate,
+      },
+      options
+    );
+    return res.status(200).json({
+      sucess: true,
+      data: profile,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
+  }
+};
+
 exports.hardDeleteEducation = async (req, res) => {
   try {
     const foundProfile = await Profile.findOne({ user: req.user.id });
