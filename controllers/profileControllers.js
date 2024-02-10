@@ -1,29 +1,37 @@
 const { validationResult } = require("express-validator");
 const Profile = require("../models/Profile");
+const request = require("request");
+const config = require("config");
 const { profile_url } = require("gravatar");
 
 exports.getCurrentProfile = async (req, res) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
   const userId = req.user.id;
+
   try {
     let currentProfile = await Profile.findOne({ user: userId }).populate(
       "user",
       ["name", "avatar"]
     );
+
     if (!currentProfile) {
       return res.status(400).json({
         errors: [{ msg: "Profile Not Found" }],
       });
     }
+
     return res.status(200).json({
       sucess: true,
       data: currentProfile,
     });
   } catch (error) {
     console.log(error.message);
+
     res.status(500).json({
       sucess: false,
       errors: [{ msg: error.message }],
@@ -37,17 +45,20 @@ exports.getAllProfiles = async (req, res) => {
       "name",
       "avatar",
     ]);
+
     if (!allProfiles) {
       return res.status(400).json({
         errors: [{ msg: "None Profile Found" }],
       });
     }
+
     return res.status(200).json({
       sucess: true,
       data: allProfiles,
     });
   } catch (error) {
     console.log(error.message);
+
     res.status(500).json({
       sucess: false,
       errors: [{ msg: error.message }],
@@ -60,22 +71,26 @@ exports.getProfileByUserId = async (req, res) => {
     const profile = await Profile.findOne({
       user: req.params.user_id,
     }).populate("user", ["name", "avatar"]);
+
     if (!profile) {
       return res.status(400).json({
         errors: [{ msg: "There is no profile for this user" }],
       });
     }
+
     return res.status(200).json({
       sucess: true,
       data: profile,
     });
   } catch (error) {
     console.log(error.message);
+
     if ((error.kind = "ObjectId")) {
       return res.status(400).json({
         errors: [{ msg: "There is no profile for this user" }],
       });
     }
+
     return res.status(500).json({
       sucess: false,
       errors: [{ msg: error.message }],
@@ -85,6 +100,7 @@ exports.getProfileByUserId = async (req, res) => {
 
 exports.updateUserProfile = async (req, res) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -128,20 +144,27 @@ exports.updateUserProfile = async (req, res) => {
       );
     } else {
       profile = new Profile(profileFields);
+
       await profile.save();
     }
 
-    return res.status(200).json({ success: true, data: profile });
+    return res.status(200).json({
+      success: true,
+      data: profile,
+    });
   } catch (error) {
     console.error(error.message);
-    return res
-      .status(500)
-      .json({ success: false, errors: [{ msg: error.message }] });
+
+    return res.status(500).json({
+      success: false,
+      errors: [{ msg: error.message }],
+    });
   }
 };
 
 exports.putExperience = async (req, res) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -165,9 +188,13 @@ exports.putExperience = async (req, res) => {
 
     await profile.save();
 
-    return res.status(200).json({ success: true, data: profile });
+    return res.status(200).json({
+      success: true,
+      data: profile,
+    });
   } catch (error) {
     console.error(error.message);
+
     return res
       .status(500)
       .json({ success: false, errors: [{ msg: error.message }] });
@@ -255,13 +282,16 @@ exports.putEducation = async (req, res) => {
 
 exports.softDeleteEducation = async (req, res) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   try {
     const fieldsToUpdate = { "education.$.isDeleted": true };
+
     const options = { new: true };
+
     const profile = await Profile.findOneAndUpdate(
       {
         user: req.user.id,
@@ -273,12 +303,14 @@ exports.softDeleteEducation = async (req, res) => {
       },
       options
     );
+
     return res.status(200).json({
       sucess: true,
       data: profile,
     });
   } catch (error) {
     console.log(error.message);
+
     res.status(500).json({
       sucess: false,
       errors: [{ msg: error.message }],
@@ -289,16 +321,20 @@ exports.softDeleteEducation = async (req, res) => {
 exports.hardDeleteEducation = async (req, res) => {
   try {
     const foundProfile = await Profile.findOne({ user: req.user.id });
+
     foundProfile.education = foundProfile.education.filter(
       (edu) => edu._id.toString() !== req.params.edu_id
     );
+
     await foundProfile.save();
+
     return res.status(200).json({
       success: true,
       data: foundProfile,
     });
   } catch (error) {
     console.error(error.message);
+
     return res
       .status(500)
       .json({ success: false, errors: [{ msg: error.message }] });
@@ -307,6 +343,7 @@ exports.hardDeleteEducation = async (req, res) => {
 
 exports.deleteProfile = async (req, res) => {
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -315,6 +352,7 @@ exports.deleteProfile = async (req, res) => {
      * @todo -remove users posts
      */
     const fieldsToUpdate = { isDeleted: true };
+
     const options = { new: true };
     // Remove profile
 
@@ -344,6 +382,45 @@ exports.deleteProfile = async (req, res) => {
         profile,
       },
     });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      sucess: false,
+      errors: [{ msg: error.message }],
+    });
+  }
+};
+
+exports.getGithubProfile = async (req, res) => {
+  try {
+    const options = {
+      uri: `https://api.github.com/users/${
+        req.params.username
+      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+        "githubClient"
+      )}&client_secret=${config.get("githubSecret")}`,
+      method: "GET",
+      headers: { "user-agent": "node.js" },
+    };
+
+    request(options, (error, response, body) => {
+      if (error) console.log(error);
+      if (response.statusCode !== 200) {
+        res.status(404).json({
+          sucess: false,
+          errors: [{ msg: "No Gihbub profile found" }],
+        });
+      }
+      return res.status(200).json({
+        sucess: true,
+        data: JSON.parse(body),
+      });
+    });
+
+    // const headers = {
+    //   "user-agent": "node.js",
+    //   Authorization: `token ${config.get("githubToken")}`,
+    // };
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

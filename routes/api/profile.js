@@ -135,4 +135,11 @@ router.delete(
 
 router.delete("/", authMiddleware, profileControllers.deleteProfile);
 
+/**
+ * @route    GET api/profile/github/:username
+ * @desc     Get user repos from Github
+ * @access   Public
+ */
+
+router.get("/github/:username", profileControllers.getGithubProfile);
 module.exports = router;
