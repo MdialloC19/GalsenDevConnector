@@ -84,6 +84,38 @@ router.delete(
   authMiddleware,
   profileControllers.hardDeleteExperience
 );
+
+/**
+ * @route PUT api/profile/education
+ * @desc  Update profile with education
+ * @access Private
+ */
+
+router.put(
+  "/education",
+  [
+    authMiddleware,
+    check("school", "School is required").notEmpty(),
+    check("degree", "Degree is required").notEmpty(),
+    check("fieldofstudy", "Field of study is required").notEmpty(),
+    check("from", "From date is required and needs to be from the past")
+      .notEmpty()
+      .custom((value, { req }) => (req.body.to ? value < req.body.to : true)),
+  ],
+  profileControllers.putEducation
+);
+
+/**
+ * @route delete api/profile/education/:edu_id
+ * @desc  hard delete for education profile with education
+ * @access Private
+ */
+router.delete(
+  "/education/:edu_id",
+  authMiddleware,
+  profileControllers.hardDeleteEducation
+);
+
 /**
  * @route DELETE api/profile
  * @desc Delete profile and user

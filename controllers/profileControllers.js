@@ -231,6 +231,47 @@ exports.softDeleteExperience = async (req, res) => {
   }
 };
 
+exports.putEducation = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    profile.education.unshift(req.body);
+
+    await profile.save();
+
+    return res.status(200).json({ success: true, data: profile });
+  } catch (error) {
+    console.error(error.message);
+    return res
+      .status(500)
+      .json({ success: false, errors: [{ msg: error.message }] });
+  }
+};
+
+exports.hardDeleteEducation = async (req, res) => {
+  try {
+    const foundProfile = await Profile.findOne({ user: req.user.id });
+    foundProfile.education = foundProfile.education.filter(
+      (edu) => edu._id.toString() !== req.params.edu_id
+    );
+    await foundProfile.save();
+    return res.status(200).json({
+      success: true,
+      data: foundProfile,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res
+      .status(500)
+      .json({ success: false, errors: [{ msg: error.message }] });
+  }
+};
+
 exports.deleteProfile = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
