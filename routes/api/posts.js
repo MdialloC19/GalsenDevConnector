@@ -26,16 +26,16 @@ router.post("/", authMiddleware, postController.postAPost);
 
 /**
  * @desc Soft delete a post.
- * @route delete api/post/:id
+ * @route delete api/post/soft/:id
  * @access Private
  */
-router.delete("/", authMiddleware, postController.softDeletePost);
+router.delete("/soft/:id", authMiddleware, postController.softDeletePost);
 
 /**
  * @desc Hard delete a post.
  * @route delete api/post/:id
  * @access Private
  */
-router.delete("/", authMiddleware, postController.hardDeletePost);
+router.delete("/:id", authMiddleware, postController.hardDeletePost);
 
 module.exports = router;

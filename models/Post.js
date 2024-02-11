@@ -57,4 +57,16 @@ const PostSchema = new Schema({
   },
 });
 
+const skipDeleted = function () {
+  this.where({ isDeleted: false });
+  this.find({ "comments.isDeleted": { $ne: false } });
+};
+
+const commonPrefixes = /^(find|delete|update)/;
+
+Object.keys(PostSchema.methods).forEach((methodName) => {
+  if (commonPrefixes.test(methodName)) {
+    PostSchema.pre(methodName, skipDeleted);
+  }
+});
 module.exports = mongoose.model("post", PostSchema);
