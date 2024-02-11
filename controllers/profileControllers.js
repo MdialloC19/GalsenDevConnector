@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const Profile = require("../models/Profile");
 const request = require("request");
 const config = require("config");
-const { profile_url } = require("gravatar");
+// const { profile_url } = require("gravatar");
 
 exports.getCurrentProfile = async (req, res) => {
   const errors = validationResult(req);
@@ -241,7 +241,7 @@ exports.softDeleteExperience = async (req, res) => {
       },
 
       {
-        $set: { "experience.$.isDeleted": true },
+        $set: fieldsToUpdate,
       },
       options
     );
@@ -345,7 +345,7 @@ exports.deleteProfile = async (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.s == tatus(400).json({ errors: errors.array() });
   }
   try {
     /**

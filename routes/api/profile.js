@@ -117,7 +117,7 @@ router.delete(
 );
 
 /**
- * @route delete api/profile/education/:edu_id
+ * @route Hard delete api/profile/education/:edu_id
  * @desc  hard delete for education profile with education
  * @access Private
  */
@@ -128,7 +128,7 @@ router.delete(
 );
 
 /**
- * @route DELETE api/profile
+ * @route Soft DELETE api/profile
  * @desc Delete profile and user
  * @access Private
  */
