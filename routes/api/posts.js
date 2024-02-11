@@ -36,6 +36,20 @@ router.delete("/soft/:id", authMiddleware, postController.softDeletePost);
  * @route delete api/post/:id
  * @access Private
  */
-router.delete("/:id", authMiddleware, postController.hardDeletePost);
+router.delete("/hard/:id", authMiddleware, postController.hardDeletePost);
+
+/**
+ * @desc Like a post
+ * @route PUT api/post/like/:id
+ * @access Private
+ */
+router.put("/like/:id", authMiddleware, postController.likeAPost);
+
+/**
+ * @desc Unlike a post
+ * @route PUT api/post/unlike/:id
+ * @access Private
+ */
+router.put("/unlike/:id", authMiddleware, postController.unLikeAPost);
 
 module.exports = router;

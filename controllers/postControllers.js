@@ -4,6 +4,12 @@ const { options } = require("../app");
 
 exports.getAllPosts = async (req, res) => {
   const errors = validationResult(req);
+  console.log(Post.statics);
+  //   Object.keys(Post.methods).forEach((methodName) => {
+  //     if (commonPrefixes.test(methodName)) {
+  //       console.log(`Method ${methodName} matches the regex`);
+  //     }
+  //   });
 
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -183,5 +189,66 @@ exports.hardDeletePost = async (req, res) => {
       success: false,
       errors: [{ msg: "Internal server error" }],
     });
+  }
+};
+
+exports.likeAPost = async (req, res) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  try {
+    const post = await Post.findById(req.params.id);
+    if (post.likes.some((like) => like.user.toString() === req.user.id)) {
+      return res.status(400).json({
+        msg: "Post already liked",
+      });
+    }
+
+    post.likes.unshift({ user: req.user.id });
+
+    await post.save();
+
+    return res.status(200).json({
+      success: true,
+      data: post.likes,
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({
+        errors: [{ msg: "Post not found" }],
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      errors: [{ msg: "Internal server error" }],
+    });
+  }
+};
+
+exports.unLikeAPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post.likes.some((like) => like.user.toString() === req.user.id)) {
+      return res.status(400).json({
+        msg: "Post has not yet been liked",
+      });
+    }
+
+    // remove the like
+    post.likes = post.likes.filter(
+      ({ user }) => user.toString() !== req.user.id
+    );
+
+    await post.save();
+
+    return res.json(post.likes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
   }
 };

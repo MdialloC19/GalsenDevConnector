@@ -62,11 +62,20 @@ const skipDeleted = function () {
   this.find({ "comments.isDeleted": { $ne: false } });
 };
 
+// PostSchema.pre("find", skipDeleted);
+// PostSchema.pre("findOne", skipDeleted);
+// PostSchema.pre("findById", skipDeleted);
+// PostSchema.pre("updateOne", skipDeleted);
+// PostSchema.pre("updateMany", skipDeleted);
+// PostSchema.pre("findOneAndUpdate", skipDeleted);
+// PostSchema.pre("deleteOne", skipDeleted);
+// PostSchema.pre("deleteMany", skipDeleted);
 const commonPrefixes = /^(find|delete|update)/;
 
-Object.keys(PostSchema.methods).forEach((methodName) => {
-  if (commonPrefixes.test(methodName)) {
-    PostSchema.pre(methodName, skipDeleted);
-  }
-});
+// Object.keys(PostSchema.statics).forEach((methodName) => {
+//   if (commonPrefixes.test(methodName)) {
+//     PostSchema.pre(methodName, skipDeleted);
+//   }
+// });
+
 module.exports = mongoose.model("post", PostSchema);
