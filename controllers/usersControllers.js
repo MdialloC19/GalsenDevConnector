@@ -18,7 +18,7 @@ exports.postUser = async (req, res) => {
   try {
     let user = await User.findOne({ email });
     //   console.log(user);
-    //see if user exists
+    //see if user exisÒts
     if (user) {
       return res.status(400).json({
         errors: [{ msg: "User already exists" }],

@@ -124,15 +124,24 @@ const ProfileSchema = new mongoose.Schema({
 
 const skipDeleted = function () {
   this.where({ isDeleted: false });
-  this.find({ "experience.isDeleted": { $ne: false } });
+  this.where("comments.isDeleted").equals(false);
 };
 
-const commonPrefixes = /^(find|delete|update)/;
+ProfileSchema.pre("find", skipDeleted);
+ProfileSchema.pre("findOne", skipDeleted);
+ProfileSchema.pre("findById", skipDeleted);
+ProfileSchema.pre("updateOne", skipDeleted);
+ProfileSchema.pre("updateMany", skipDeleted);
+ProfileSchema.pre("findOneAndUpdate", skipDeleted);
+ProfileSchema.pre("deleteOne", skipDeleted);
+ProfileSchema.pre("deleteMany", skipDeleted);
 
-Object.keys(ProfileSchema.methods).forEach((methodName) => {
-  if (commonPrefixes.test(methodName)) {
-    ProfileSchema.pre(methodName, skipDeleted);
-  }
-});
+// const commonPrefixes = /^(find|delete|update)/;
+
+// Object.keys(ProfileSchema.methods).forEach((methodName) => {
+//   if (commonPrefixes.test(methodName)) {
+//     ProfileSchema.pre(methodName, skipDeleted);
+//   }
+// });
 
 module.exports = mongoose.model("profile", ProfileSchema);

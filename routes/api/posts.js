@@ -2,12 +2,14 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../../middleware/auth");
 const postController = require("../../controllers/postControllers");
+const { check } = require("express-validator");
 
 /**
  * @desc Route to get all posts.
  * @route GET api/posts
  * @access Private
  */
+
 router.get("/", authMiddleware, postController.getAllPosts);
 
 /**
@@ -15,6 +17,7 @@ router.get("/", authMiddleware, postController.getAllPosts);
  * @route GET api/post/=id
  * @access Private
  */
+
 router.get("/:id", authMiddleware, postController.getPostById);
 
 /**
@@ -22,6 +25,7 @@ router.get("/:id", authMiddleware, postController.getPostById);
  * @route POST api/posts
  * @access Private
  */
+
 router.post("/", authMiddleware, postController.postAPost);
 
 /**
@@ -51,5 +55,27 @@ router.put("/like/:id", authMiddleware, postController.likeAPost);
  * @access Private
  */
 router.put("/unlike/:id", authMiddleware, postController.unLikeAPost);
+
+/**
+ * @desc Post a comment for a post.
+ * @route delete api/post/comment/:id
+ * @access Private
+ */
+router.post(
+  "/comment/:id",
+  [authMiddleware, check("text", "Text is required").notEmpty()],
+  postController.postComment
+);
+
+/**
+ * @desc Soft delete a comment for a post.
+ * @route delete api/post/comment/:id
+ * @access Private
+ */
+router.delete(
+  "/comment/:id/:comment_id",
+  authMiddleware,
+  postController.deleteComment
+);
 
 module.exports = router;
